@@ -1,0 +1,10 @@
+{
+  "benign_traffic.pcap": "Normal office traffic only. No detections expected.",
+  "port_scan.pcap": "A rogue internal host SYN-scans 40 ports on the web server.",
+  "dns_anomaly.pcap": "DNS tunnelling-style names, many failed (NXDOMAIN) lookups, and a query flood - three different hosts.",
+  "repeated_connections.pcap": "SSH password-guessing pattern from an external address, plus repeated attempts to port 4444.",
+  "traffic_burst.pcap": "A quiet workstation suddenly uploads 1,800 packets in 6 seconds.",
+  "beaconing.pcap": "A workstation connects to the same external server every ~60 seconds.",
+  "arp_spoofing.pcap": "A rogue host claims the gateway's IP address with its own MAC address.",
+  "mixed_investigation.pcap": "Demo capture: normal traffic plus every attack pattern above."
+}

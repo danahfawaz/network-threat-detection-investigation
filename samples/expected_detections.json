@@ -1,0 +1,34 @@
+{
+  "_about": "Ground truth for the synthetic samples. Each entry lists the findings the enabled rules must produce - no more, no fewer. 'src' is the suspected source (IP address, or MAC address when no IP is known).",
+  "benign_traffic.pcap": [],
+  "port_scan.pcap": [
+    {"rule": "port_scan", "src": "192.168.10.66"}
+  ],
+  "dns_anomaly.pcap": [
+    {"rule": "dns_anomaly", "src": "192.168.10.25", "subtype": "Suspicious domain names"},
+    {"rule": "dns_anomaly", "src": "192.168.10.20", "subtype": "Many failed lookups"},
+    {"rule": "dns_anomaly", "src": "192.168.10.35", "subtype": "Query flood"}
+  ],
+  "repeated_connections.pcap": [
+    {"rule": "connection_attempts", "src": "203.0.113.45", "subtype": "Possible password guessing"},
+    {"rule": "connection_attempts", "src": "192.168.10.21", "subtype": "Connections to a watchlist port"}
+  ],
+  "traffic_burst.pcap": [
+    {"rule": "traffic_burst", "src": "192.168.10.20"}
+  ],
+  "beaconing.pcap": [
+    {"rule": "beaconing", "src": "192.168.10.25"}
+  ],
+  "arp_spoofing.pcap": [
+    {"rule": "arp_spoofing", "src": "02:00:00:0a:00:42"}
+  ],
+  "mixed_investigation.pcap": [
+    {"rule": "port_scan", "src": "192.168.10.66"},
+    {"rule": "dns_anomaly", "src": "192.168.10.25", "subtype": "Suspicious domain names"},
+    {"rule": "connection_attempts", "src": "203.0.113.45", "subtype": "Possible password guessing"},
+    {"rule": "connection_attempts", "src": "192.168.10.21", "subtype": "Connections to a watchlist port"},
+    {"rule": "traffic_burst", "src": "192.168.10.20"},
+    {"rule": "beaconing", "src": "192.168.10.25"},
+    {"rule": "arp_spoofing", "src": "192.168.10.66"}
+  ]
+}
