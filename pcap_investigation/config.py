@@ -68,6 +68,8 @@ class BeaconConfig:
     # UDP has no handshake: packets more than this many seconds apart start a
     # new "connection".
     udp_session_gap: float = 1.0
+    # Services that are periodic by design (DNS has its own rule, NTP, mDNS, SSDP).
+    ignore_ports: tuple[int, ...] = (53, 123, 5353, 1900)
 
 
 @dataclass
