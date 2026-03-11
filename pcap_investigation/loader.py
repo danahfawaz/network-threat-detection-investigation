@@ -123,6 +123,9 @@ class _ScapyWarningCollector(logging.Handler):
 
 def read_packets(path: str | Path, info: CaptureInfo, max_packets: int = 500_000) -> list:
     """Read packets with Scapy. Fills packet_count / truncated / warnings in ``info``."""
+    # Scapy only decodes Ethernet/IP/TCP/DNS... if its protocol layers are
+    # loaded *before* reading; otherwise every packet stays raw bytes.
+    import scapy.layers.all  # noqa: F401
     from scapy.error import Scapy_Exception
     from scapy.utils import PcapReader
 
