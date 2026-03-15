@@ -91,6 +91,13 @@ def test_summary_counts():
     assert summary.top_dst_ports[0]["packets"] >= 1
 
 
+def test_top_ports_ignore_replies_to_client_ports():
+    summary = summarize(normalize_packets(_mixed_packets()))
+    ports = [p["port"] for p in summary.top_dst_ports]
+    assert 443 in ports and 53 in ports
+    assert 40000 not in ports and 5000 not in ports  # client-side reply ports
+
+
 def test_hosts_table_counts_sent_and_received():
     hosts = hosts_table(normalize_packets(_mixed_packets())).set_index("ip")
     assert hosts.loc["192.168.10.5", "packets_sent"] == 3

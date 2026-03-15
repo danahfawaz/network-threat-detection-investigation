@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investigation Report - {{ capture.file_name }}</title>
+<style>
+  :root {
+    --ink: #2a2124; --muted: #6f6467; --line: #e8dfe0; --soft: #faf6f6; --panel: #ffffff;
+    --rose: #b96d78; --rose-dark: #6f3540; --bg: #f4efef;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 14px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .page { max-width: 980px; margin: 0 auto; padding: 32px 24px 56px; }
+  header { background: var(--rose-dark); color: #f6eef0; border-radius: 12px; padding: 26px 28px; }
+  header .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 11px; opacity: .75; }
+  header h1 { margin: 6px 0 4px; font-size: 24px; font-weight: 650; }
+  header .meta { font-size: 13px; opacity: .85; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+            padding: 22px 26px; margin-top: 18px; }
+  h2 { font-size: 17px; margin: 0 0 14px; color: var(--rose-dark); }
+  h2 .num { color: var(--rose); margin-right: 6px; }
+  h3 { font-size: 15px; margin: 18px 0 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat { background: var(--soft); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .stat .v { font-size: 20px; font-weight: 650; margin-top: 2px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); border-bottom: 2px solid var(--line); padding: 7px 8px; }
+  td { border-bottom: 1px solid var(--line); padding: 7px 8px; vertical-align: top; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: nowrap; }
+  .hash { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; word-break: break-all; }
+  .nowrap { white-space: nowrap; }
+  .badge { display: inline-block; color: #fff; border-radius: 999px; padding: 1px 10px; font-size: 12px; font-weight: 600; }
+  .risk { display: flex; align-items: center; gap: 18px; }
+  .risk .score { font-size: 40px; font-weight: 700; }
+  .finding { border: 1px solid var(--line); border-left: 5px solid var(--rose); border-radius: 10px;
+             padding: 16px 18px; margin-top: 16px; page-break-inside: avoid; }
+  .finding .head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  .finding .title { font-size: 16px; font-weight: 650; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--rose); font-weight: 700; margin-top: 12px; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px 16px;
+           background: var(--soft); border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 13px; }
+  .facts span { color: var(--muted); }
+  ul { margin: 4px 0 0; padding-left: 20px; }
+  li { margin: 2px 0; }
+  .note { background: #fdf3e7; border: 1px solid #f0dcc0; border-radius: 8px; padding: 8px 12px; margin-top: 10px; font-size: 13px; }
+  .clean { background: #eef5ef; border: 1px solid #cfe2d2; border-radius: 10px; padding: 16px; font-weight: 600; color: #3d6a45; }
+  .muted { color: var(--muted); }
+  svg text { font-size: 10px; fill: var(--muted); }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 26px; }
+  @media print {
+    body { background: #fff; }
+    .page { padding: 0; }
+    section, header { break-inside: avoid-page; }
+    header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge, .finding { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="eyebrow">Network Threat Detection &amp; Digital Investigation</div>
+  <h1>Investigation Report</h1>
+  <div class="meta">Capture: <strong>{{ capture.file_name }}</strong> &middot; Analyzed {{ result.analyzed_at }} &middot; Tool version {{ result.tool_version }}</div>
+</header>
+
+<section>
+  <h2><span class="num">1</span>Summary</h2>
+  <div class="risk">
+    <div class="score" style="color: {{ overall_color }}">{{ result.overall_score }}<span class="muted" style="font-size:18px">/100</span></div>
+    <div>
+      <span class="badge" style="background: {{ overall_color }}">{{ result.overall_severity if result.findings else "No findings" }}</span>
+      <div class="muted" style="margin-top:4px">Overall capture risk</div>
+    </div>
+  </div>
+  <p>{{ executive_summary }}</p>
+  {% if result.findings %}
+  <div class="grid">
+    {% for sev, n in counts.items() %}
+    <div class="stat"><div class="k">{{ sev }}</div><div class="v" style="color: {{ colors[sev] }}">{{ n }}</div></div>
+    {% endfor %}
+  </div>
+  <p class="muted" style="margin-bottom:0">How the overall score was reached: {{ result.overall_reasons | join("; ") }}.</p>
+  {% else %}
+  <div class="clean">No suspicious activity detected by the enabled rules.</div>
+  {% endif %}
+  {% for note in result.notes %}<div class="note">{{ note }}</div>{% endfor %}
+</section>
+
+<section>
+  <h2><span class="num">2</span>Capture details</h2>
+  <table>
+    <tr><td style="width:190px">File name</td><td>{{ capture.file_name }}</td></tr>
+    <tr><td>SHA-256</td><td class="hash">{{ capture.sha256 }}</td></tr>
+    <tr><td>Format / size</td><td>{{ capture.file_format | upper }} &middot; {{ file_size }}</td></tr>
+    <tr><td>Packets analyzed</td><td>{{ "{:,}".format(summary.total_packets) }} ({{ total_bytes }}){% if capture.truncated %} &middot; capture was cut at the packet limit{% endif %}</td></tr>
+    <tr><td>First packet</td><td>{{ first_packet }}</td></tr>
+    <tr><td>Last packet</td><td>{{ last_packet }}</td></tr>
+    <tr><td>Duration</td><td>{{ duration }}</td></tr>
+    <tr><td>IP addresses</td><td>{{ summary.unique_hosts }} ({{ summary.internal_hosts }} internal, {{ summary.external_hosts }} external)</td></tr>
+    <tr><td>Protocols</td><td>{% for name, n in protocols %}{{ name }} {{ "{:,}".format(n) }}{% if not loop.last %} &middot; {% endif %}{% endfor %}</td></tr>
+    <tr><td>Top destination ports</td><td>{% for p in summary.top_dst_ports %}{{ p.label }}: {{ "{:,}".format(p.packets) }}{% if not loop.last %} &middot; {% endif %}{% endfor %}</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">3</span>Traffic timeline</h2>
+  <svg viewBox="0 0 {{ chart.width }} {{ chart.height + 40 }}" width="100%" role="img" aria-label="Packets over time">
+    {% for m in chart.marks %}
+    <rect x="{{ m.x }}" y="0" width="{{ m.w }}" height="{{ chart.height }}" fill="{{ m.color }}" opacity="0.13"><title>{{ m.label }}</title></rect>
+    {% endfor %}
+    {% for b in chart.bars %}
+    <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="#b96d78"><title>{{ b.label }}</title></rect>
+    {% endfor %}
+    <line x1="0" y1="{{ chart.height }}" x2="{{ chart.width }}" y2="{{ chart.height }}" stroke="#e8dfe0"/>
+    {% for m in chart.marks %}
+    <text x="{{ m.x }}" y="{{ chart.height + 14 + (loop.index0 % 2) * 12 }}" style="fill: {{ m.color }}; font-weight: 700">{{ m.id }}</text>
+    {% endfor %}
+    <text x="0" y="{{ chart.height + 38 }}">{{ chart.start }} UTC</text>
+    <text x="{{ chart.width }}" y="{{ chart.height + 38 }}" text-anchor="end">{{ chart.end }} UTC</text>
+  </svg>
+  <p class="muted" style="margin:6px 0 0">Packets per {{ chart.bin }} (peak {{ chart.peak }}). Shaded areas show when each finding was active.</p>
+  {% if events %}
+  <h3>Event timeline</h3>
+  <table>
+    <tr><th>Time (UTC)</th><th>Event</th><th>Source</th><th>Severity</th></tr>
+    {% for e in events %}
+    <tr><td class="mono">{{ e.time }}</td><td>{{ e.text }}</td><td class="mono">{{ e.host }}</td><td><span class="badge" style="background: {{ e.color }}">{{ e.severity }}</span></td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</section>
+
+{% if findings %}
+<section>
+  <h2><span class="num">4</span>Findings overview</h2>
+  <table>
+    <tr><th>ID</th><th>First seen</th><th>Detection</th><th>Source</th><th>Destination</th><th>Severity</th><th>Risk</th></tr>
+    {% for item in findings %}{% set f = item.f %}
+    <tr><td class="nowrap">{{ f.id }}</td><td class="mono">{{ item.first[11:19] }}</td><td>{{ f.title }}<div class="muted">{{ f.summary }}</div></td>
+        <td class="mono">{{ f.source_label }}</td><td class="mono">{{ f.destination_label }}</td>
+        <td><span class="badge" style="background: {{ item.color }}">{{ f.severity }}</span></td><td><strong>{{ f.score }}</strong></td></tr>
+    {% endfor %}
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">5</span>Detailed findings</h2>
+  {% for item in findings %}{% set f = item.f %}
+  <div class="finding" style="border-left-color: {{ item.color }}">
+    <div class="head">
+      <div class="title">{{ f.id }} &middot; {{ f.title }}{% if f.subtype %} <span class="muted" style="font-weight:400">({{ f.subtype }})</span>{% endif %}</div>
+      <div><span class="badge" style="background: {{ item.color }}">{{ f.severity }}</span> <strong>{{ f.score }}/100</strong></div>
+    </div>
+    <div class="label">What happened</div>
+    <div>{{ f.what_happened }}</div>
+    <div class="label">Why it was flagged</div>
+    <div>{{ f.why_flagged }}</div>
+    <div class="facts">
+      <div><span>Source:</span> <span class="mono" style="color:inherit">{{ f.source_label }}</span></div>
+      <div><span>Destination:</span> <span class="mono" style="color:inherit">{{ f.destination_label }}</span></div>
+      <div><span>Protocol:</span> {{ f.protocol }}</div>
+      <div><span>Ports:</span> {{ item.ports }}</div>
+      <div><span>First seen:</span> {{ item.first }}</div>
+      <div><span>Last seen:</span> {{ item.last }}</div>
+      <div><span>Duration:</span> {{ item.duration }}</div>
+      <div><span>Count:</span> {{ "{:,}".format(f.event_count) }} {{ f.event_label }}</div>
+    </div>
+    <div class="label">Evidence</div>
+    <ul>{% for line in f.evidence %}<li>{{ line }}</li>{% endfor %}</ul>
+    <div class="label">Risk score explanation ({{ f.score }}/100)</div>
+    <ul>{% for line in item.score_lines %}<li>{{ line }}</li>{% endfor %}</ul>
+    {% if item.packets %}
+    <div class="label">Sample packets</div>
+    <table>
+      <tr><th>#</th><th>Time (UTC)</th><th>Source</th><th>Destination</th><th>Proto</th><th>Ports</th><th>Flags / info</th></tr>
+      {% for p in item.packets %}
+      <tr><td>{{ p.frame }}</td><td class="mono">{{ p.time[11:19] }}</td><td class="mono">{{ p.source }}</td><td class="mono">{{ p.destination }}</td>
+          <td>{{ p.protocol }}</td><td class="mono">{% if p.src_port is not none %}{{ p.src_port }} &rarr; {{ p.dst_port }}{% endif %}</td>
+          <td class="mono">{{ p.flags }}{% if p.flags and p.info %} &middot; {% endif %}{{ p.info }}</td></tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+    <div class="label">Recommended next steps</div>
+    <ul>{% for step in f.recommended_steps %}<li>{{ step }}</li>{% endfor %}</ul>
+  </div>
+  {% endfor %}
+</section>
+
+<section>
+  <h2><span class="num">6</span>Involved hosts</h2>
+  <table>
+    <tr><th>Host</th><th>Scope</th><th>Role</th><th>Findings</th><th>Highest severity</th><th>Packets sent / received</th></tr>
+    {% for h in hosts %}
+    <tr><td class="mono">{{ h.host }}</td><td>{{ h.scope }}</td><td>{{ h.role }}</td><td>{{ h.findings }}</td>
+        <td><span class="badge" style="background: {{ colors[h.highest_severity] }}">{{ h.highest_severity }}</span></td>
+        <td>{% if h.packets_sent is not none %}{{ "{:,}".format(h.packets_sent) }} / {{ "{:,}".format(h.packets_received) }}{% else %}-{% endif %}</td></tr>
+    {% endfor %}
+  </table>
+</section>
+
+<section>
+  <h2><span class="num">7</span>Recommended investigation steps</h2>
+  <ol>{% for step in next_steps %}<li>{{ step }}</li>{% endfor %}</ol>
+</section>
+{% endif %}
+
+<section>
+  <h2><span class="num">{{ 8 if findings else 4 }}</span>Method and limits</h2>
+  <p style="margin-top:0">Findings come from deterministic, rule-based checks on the packets in this capture. Each finding is a lead for an investigator to confirm, not proof of an attack.</p>
+  <table>
+    <tr><th style="width:190px">Enabled rule</th><th>Flags when</th><th>Base points</th></tr>
+    {% for r in rules %}
+    <tr><td>{{ r.key | replace("_", " ") | title }}</td><td>{{ r.description }}</td><td>{{ r.base }}</td></tr>
+    {% endfor %}
+  </table>
+  <p class="muted">Risk score = base points + 5 to 20 for how far past the threshold + 10 each for fast, sensitive target, persistent and confirming evidence (maximum 100). Severity: 80+ Critical, 60-79 High, 40-59 Medium, below 40 Low. Times are UTC, taken from the capture file.</p>
+</section>
+
+<footer>Network Threat Detection &amp; Digital Investigation &middot; generated from {{ capture.file_name }} (SHA-256 {{ capture.sha256[:16] }}...)</footer>
+</div>
+</body>
+</html>

@@ -76,7 +76,12 @@ def summarize(frame: pd.DataFrame, top_ports: int = 6) -> TrafficSummary:
     hosts = pd.unique(pd.concat([ip_rows["src_ip"], ip_rows["dst_ip"]]).dropna())
     scopes = [ip_scope(h) for h in hosts]
 
-    port_rows = frame[frame["protocol"].isin(["TCP", "UDP"]) & frame["dport"].notna()]
+    # Count packets travelling *to* a service: the destination port is the
+    # lower of the two ports. Replies (going back to the client's random
+    # high port) are skipped so they do not show up as "top ports".
+    port_rows = frame[frame["protocol"].isin(["TCP", "UDP"]) & frame["dport"].notna()
+                      & frame["sport"].notna()]
+    port_rows = port_rows[port_rows["dport"] <= port_rows["sport"]]
     port_counts = port_rows["dport"].astype(int).value_counts()
     top = port_counts.head(top_ports)
     top_list = [{"port": int(p), "service": service_name(p), "label": port_label(p),

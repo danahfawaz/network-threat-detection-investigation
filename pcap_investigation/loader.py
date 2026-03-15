@@ -71,7 +71,7 @@ def validate_capture_file(path: str | Path, display_name: str | None = None,
 
     if Path(name).suffix.lower() not in SUPPORTED_EXTENSIONS:
         raise UnsupportedFileError(
-            f"'{name}' is not a supported file type. Please upload a .pcap or .pcapng capture."
+            f"'{name}' is not a supported file type. Please choose a .pcap or .pcapng capture."
         )
     if not path.exists():
         raise CaptureError(f"File '{name}' was not found.")
