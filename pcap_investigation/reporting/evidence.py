@@ -60,6 +60,20 @@ def packet_rows(frame: pd.DataFrame, frames: list[int]) -> list[dict]:
     return rows
 
 
+def finding_packet_mask(frame: pd.DataFrame, finding: Finding) -> pd.Series:
+    """Packets that belong to a finding: same source, inside its active period,
+    and (where the rule has them) to its targets and ports."""
+    in_time = (frame["ts"] >= finding.first_seen) & (frame["ts"] <= finding.last_seen)
+    if finding.rule == "arp_spoofing":
+        return in_time & (frame["protocol"] == "ARP") & (frame["arp_hwsrc"] == finding.src_mac)
+    mask = in_time & (frame["src_ip"] == finding.src_ip)
+    if finding.targets:
+        mask &= frame["dst_ip"].isin(finding.targets)
+    if finding.ports and finding.rule != "traffic_burst":
+        mask &= frame["dport"].isin(finding.ports)
+    return mask.fillna(False).astype(bool)
+
+
 def score_explanation(finding: Finding) -> list[str]:
     return [f"+{factor.points} {factor.label}: {factor.reason}" for factor in finding.score_factors]
 

@@ -109,6 +109,21 @@ def test_packet_rows_are_readable(mixed):
     assert rows[0]["source"] == "192.168.10.66" and rows[0]["flags"] == "S"
 
 
+def test_finding_packet_mask_selects_the_right_packets(mixed):
+    from pcap_investigation.reporting.evidence import finding_packet_mask
+
+    scan = next(f for f in mixed.findings if f.rule == "port_scan")
+    scan_packets = mixed.packets[finding_packet_mask(mixed.packets, scan)]
+    # the 40 SYN probes + the scanner's reset after each of the 4 open ports
+    assert len(scan_packets) == scan.event_count + len(scan.metrics["open_ports"])
+    assert set(scan_packets["src_ip"]) == {"192.168.10.66"}
+
+    arp = next(f for f in mixed.findings if f.rule == "arp_spoofing")
+    arp_packets = mixed.packets[finding_packet_mask(mixed.packets, arp)]
+    assert len(arp_packets) == arp.event_count
+    assert set(arp_packets["protocol"]) == {"ARP"}
+
+
 def test_involved_hosts_and_next_steps(mixed):
     hosts = {h["host"]: h for h in involved_hosts(mixed)}
     assert hosts["192.168.10.66"]["role"] == "Source"
