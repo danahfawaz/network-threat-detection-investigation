@@ -77,7 +77,7 @@ def test_jitter_tolerance():
 
 def test_udp_sessions_and_ignored_ports():
     packets = []
-    for i, ts in enumerate(periodic(10, 30)):
+    for ts in periodic(10, 30):
         for j in range(3):  # each UDP "session" is a few packets close together
             pkt = Ether() / IP(src=HOST, dst=SERVER) / UDP(sport=40000, dport=9999)
             pkt.time = ts + j * 0.05
