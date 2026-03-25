@@ -102,6 +102,29 @@ def validate_capture_file(path: str | Path, display_name: str | None = None,
     )
 
 
+def pcap_is_truncated(path: str | Path) -> bool:
+    """True if the last record of a classic pcap file is cut off.
+
+    Walks the 16-byte record headers only (no packet parsing): each header
+    says how many bytes follow, so a short file is easy to spot.
+    """
+    path = Path(path)
+    size = path.stat().st_size
+    with path.open("rb") as handle:
+        magic = handle.read(4)
+        if magic not in _PCAP_MAGICS:
+            return False
+        endian = "<" if magic in (bytes.fromhex("d4c3b2a1"), bytes.fromhex("4d3cb2a1")) else ">"
+        offset = 24
+        while offset < size:
+            if offset + 16 > size:
+                return True
+            handle.seek(offset + 8)
+            (included_length,) = struct.unpack(endian + "I", handle.read(4))
+            offset += 16 + included_length
+        return offset > size
+
+
 def sha256_file(path: str | Path) -> str:
     digest = hashlib.sha256()
     with Path(path).open("rb") as handle:
@@ -162,7 +185,8 @@ def read_packets(path: str | Path, info: CaptureInfo, max_packets: int = 500_000
         scapy_logger.setLevel(saved_level)
         scapy_logger.propagate = saved_propagate
 
-    if any("truncated" in message for message in collector.messages):
+    truncated_file = info.file_format == "pcap" and pcap_is_truncated(path)
+    if truncated_file or any("truncated" in message for message in collector.messages):
         info.warnings.append(
             "Some packets in the capture are truncated (incomplete). "
             "They were analyzed with the data available."

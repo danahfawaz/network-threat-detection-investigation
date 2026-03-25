@@ -1,6 +1,8 @@
-scapy>=2.5,<3
-pandas>=2.0
-streamlit>=1.50
+# Tested with Python 3.10 - 3.13. Lower bounds are the oldest versions the
+# full test suite was run against. (Scapy 2.6.0 is skipped: it can fail on import.)
+scapy>=2.5,!=2.6.0,<3
+pandas>=2.1
+streamlit>=1.53
 plotly>=5.20
 jinja2>=3.1
 pytest>=8.0
