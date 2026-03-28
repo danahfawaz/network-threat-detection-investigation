@@ -51,7 +51,7 @@ def test_report_escapes_packet_content(write_pcap):
     """DNS names come from the network and must never be rendered as HTML."""
     packets = []
     for i in range(6):
-        name = f"<script>alert({i})</script>{'a' * 40}.evil.example"
+        name = f"<script>alert({i})</script>{'a' * 40}.evil-example.test"
         pkt = Ether() / IP(src="192.168.1.25", dst="192.168.1.1") / UDP(sport=5000, dport=53) / DNS(qd=DNSQR(qname=name))
         pkt.time = BASE_TIME + i
         packets.append(pkt)

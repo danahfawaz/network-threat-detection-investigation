@@ -196,7 +196,7 @@ def add_dns_tunnelling(cap: Capture, start: float, host: str = "192.168.10.25", 
     t = start
     for _ in range(count):
         label = random_label(cap.rng, 48, alphabet)
-        cap.dns_lookup(t, host, f"{label}.sync.tunnel.example", answer_ip="203.0.113.53")
+        cap.dns_lookup(t, host, f"{label}.sync.tunnel-example.test", answer_ip="203.0.113.53")
         t += cap.rng.uniform(1.5, 4.0)
 
 

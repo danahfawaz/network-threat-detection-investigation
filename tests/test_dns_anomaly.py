@@ -40,7 +40,7 @@ def test_entropy_is_higher_for_random_text():
 
 
 def test_parent_domain():
-    assert parent_domain("a.b.tunnel.example") == "tunnel.example"
+    assert parent_domain("a.b.tunnel-example.test") == "tunnel-example.test"
     assert parent_domain("example.com") == "example.com"
 
 
@@ -74,12 +74,12 @@ def test_spread_out_queries_are_not_a_flood():
 # -- check B: suspicious names -----------------------------------------------
 
 def test_suspicious_names_threshold_and_evidence():
-    names = [f"{i:02d}{'x7k2' * 11}.sync.tunnel.example" for i in range(5)]
+    names = [f"{i:02d}{'x7k2' * 11}.sync.tunnel-example.test" for i in range(5)]
     packets = [query(name, BASE_TIME + i) for i, name in enumerate(names)]
     findings = dns_anomaly.detect(normalize_packets(packets), DnsConfig(suspicious_name_min_count=5))
     assert subtypes(findings) == ["Suspicious domain names"]
     finding = findings[0]
-    assert finding.metrics["top_parent_domain"] == "tunnel.example"
+    assert finding.metrics["top_parent_domain"] == "tunnel-example.test"
     assert finding.signals.confirmed  # all under one parent domain
     assert dns_anomaly.detect(normalize_packets(packets[:4]), DnsConfig(suspicious_name_min_count=5)) == []
 
