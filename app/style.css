@@ -235,6 +235,7 @@ div[class*="st-key-action-"] button {
   color: var(--rose-soft) !important;
 }
 div[class*="st-key-action-"] button p { font-size: 0.82rem !important; }
+div[class*="st-key-action-"] button:disabled { opacity: 0.35; }
 
 /* ---------- detail dialog ---------- */
 div[role="dialog"] { background: #1D1618 !important; border: 1px solid var(--border-strong); }

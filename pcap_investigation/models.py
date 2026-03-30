@@ -100,7 +100,9 @@ def format_duration(seconds: float) -> str:
     if seconds < 1:
         return f"{seconds * 1000:.0f} ms"
     if seconds < 60:
-        return f"{seconds:.1f} sec" if seconds < 10 else f"{seconds:.0f} sec"
+        if seconds < 10 and not seconds.is_integer():
+            return f"{seconds:.1f} sec"
+        return f"{seconds:.0f} sec"
     minutes, secs = divmod(int(round(seconds)), 60)
     if minutes < 60:
         return f"{minutes} min {secs} sec" if secs else f"{minutes} min"

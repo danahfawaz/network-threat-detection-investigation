@@ -121,7 +121,8 @@ PANEL_HEIGHT = 268
 
 def overview_row(result) -> None:
     c1, c2, c3 = st.columns([1.02, 1.02, 1.12], gap="small")
-    with c1, st.container(key="panel-severity", border=True, height=PANEL_HEIGHT):
+    height = PANEL_HEIGHT if result.findings else "content"  # equal heights only when there is data
+    with c1, st.container(key="panel-severity", border=True, height=height):
         render(panel_title("Threats by Severity"))
         if not result.findings:
             render('<div class="empty-note">No findings to rank.</div>')
@@ -132,7 +133,7 @@ def overview_row(result) -> None:
                                 config=charts.CHART_CONFIG, width="stretch", key="donut")
             with legend_col:
                 render(severity_legend(result.severity_counts))
-    with c2, st.container(key="panel-types", border=True, height=PANEL_HEIGHT):
+    with c2, st.container(key="panel-types", border=True, height=height):
         render(panel_title("Threat Types Detected"))
         per_rule = defaultdict(list)
         for f in result.findings:
@@ -140,7 +141,7 @@ def overview_row(result) -> None:
         rows = [{"label": esc(RULE_TITLES[rule]), "value": len(per_rule[rule]), "color": RULE_COLORS[rule],
                  "title": ", ".join(f.id for f in per_rule[rule])} for rule in RULE_ORDER if per_rule[rule]]
         render(bar_list(rows, label_width="46%") if rows else '<div class="empty-note">None detected.</div>')
-    with c3, st.container(key="panel-sources", border=True, height=PANEL_HEIGHT):
+    with c3, st.container(key="panel-sources", border=True, height=height):
         render(panel_title("Top Source IPs", "(by suspicious activity)"))
         per_source = defaultdict(list)
         for f in result.findings:
