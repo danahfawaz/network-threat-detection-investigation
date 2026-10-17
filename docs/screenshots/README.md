@@ -1,11 +1,11 @@
 # Screenshots
 
-Add these four screenshots here after local validation. The main README already links to
-these exact file names.
+Screenshots of the dashboard analyzing `samples/mixed_investigation.pcap`. The main README links
+to these files.
 
-| File | What to capture |
+| File | What it shows |
 |---|---|
-| `dashboard.png` | Main dashboard after analyzing `samples/mixed_investigation.pcap` |
-| `investigation-detail.png` | The detail view of one finding (click **View** on a row) |
-| `threat-timeline.png` | The **Threat Timeline** view |
-| `investigation-report.png` | The top of the exported HTML investigation report |
+| `dashboard.png` | Main dashboard after analysis |
+| `investigation-detail.png` | Detail view of the Port Scan finding |
+| `threat-timeline.png` | Threat Timeline view |
+| `investigation-report.png` | The exported HTML investigation report (top sections) |

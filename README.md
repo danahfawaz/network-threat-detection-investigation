@@ -6,6 +6,10 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-b96d78)
 ![License: MIT](https://img.shields.io/badge/license-MIT-6f3540)
 
+### ▶ [Live demo: threat-investigation.streamlit.app](https://threat-investigation.streamlit.app/)
+
+Open the demo, choose **Use a sample capture → mixed_investigation.pcap** and click **Analyze PCAP**.
+
 A Python application that analyzes network captures (PCAP / PCAPNG), detects suspicious
 behavior with clear rules, and shows the **evidence** behind every finding in an interactive
 investigation dashboard.
