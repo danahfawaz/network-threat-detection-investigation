@@ -96,7 +96,7 @@ div[class*="st-key-panel-"], div[class*="st-key-export-card-"] { padding: 0.95re
 .upload-intro { display: flex; align-items: center; gap: 1rem; }
 .upload-title { font-size: 1.3rem; font-weight: 600; color: var(--text); }
 .upload-sub { font-size: 0.92rem; color: var(--muted); margin-top: 0.1rem; }
-.st-key-upload-bar [data-testid="stPopover"] { margin-left: 3.9rem; margin-top: -0.4rem; }
+.st-key-upload-bar [data-testid="stPopover"] { margin-left: 4.9rem; margin-top: 0.35rem; }
 .st-key-upload-bar [data-testid="stPopover"] button { padding: 0 !important; min-height: 0; }
 .st-key-upload-bar [data-testid="stPopover"] button p { font-size: 0.8rem; color: var(--rose-soft); }
 
@@ -157,7 +157,8 @@ div[class*="st-key-panel-"], div[class*="st-key-export-card-"] { padding: 0.95re
   color: var(--rose-soft);
 }
 .icon-tile.big { width: 64px; height: 64px; min-width: 64px; }
-.stat-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.75rem; }
+/* margin-bottom cancels Streamlit's -1rem markdown margin so the cards do not touch the next row */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
 .stat-card {
   display: flex; align-items: center; gap: 1rem;
   background: linear-gradient(180deg, #221A1C 0%, #1E1719 100%);
@@ -165,7 +166,8 @@ div[class*="st-key-panel-"], div[class*="st-key-export-card-"] { padding: 0.95re
 }
 .stat-body { min-width: 0; }
 .stat-label { font-size: 0.92rem; color: var(--muted); }
-.stat-value { font-size: 1.6rem; font-weight: 650; color: var(--text); line-height: 1.25; white-space: nowrap; }
+.stat-value { font-size: 1.6rem; font-weight: 650; color: var(--text); line-height: 1.25; white-space: nowrap;
+  display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.3rem; }
 .stat-value .of { font-size: 1.05rem; color: var(--muted); font-weight: 500; }
 .stat-sub { font-size: 0.8rem; color: var(--faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .badge {

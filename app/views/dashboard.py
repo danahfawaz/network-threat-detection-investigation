@@ -250,7 +250,7 @@ def investigation_actions(result) -> None:
             with button_col:
                 if export is None:
                     top = max(result.findings, key=lambda f: f.score) if result.findings else None
-                    if st.button("Open", key="action-detail", icon=":material/chevron_right:", icon_position="right",
+                    if st.button("Open", key="open-detail", icon=":material/chevron_right:", icon_position="right",
                                  disabled=top is None, width="stretch"):
                         show_finding_dialog(top.id)
                 else:
